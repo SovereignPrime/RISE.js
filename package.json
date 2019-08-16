@@ -1,0 +1,33 @@
+{
+  "name": "rise",
+  "version": "0.1.0",
+  "description": "RISE internal logic",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SovereignPrime/RISE.js.git"
+  },
+  "keywords": [
+    "IPFS",
+    "JS",
+    "sharing",
+    "collaboration",
+    "distributed",
+    "messaging",
+    "task",
+    "management"
+  ],
+  "author": "Geroges Landry",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SovereignPrime/RISE.js/issues"
+  },
+  "homepage": "https://github.com/SovereignPrime/RISE.js#readme",
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "ipfs": "^0.37.0"
+  }
+}
