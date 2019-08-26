@@ -1,19 +1,10 @@
 'use strict'
 
-const IPFS = require('ipfs');
+const RISE = require('./network');
+const Message = require('./message');
+const rise = RISE.rise;
 
-class Rise {
-    constructor() {
-        this.node = new IPFS();
-        this.node.once('ready', () => {
-            this.node.repo.stat((err, data) => this.stats = data);
-        });
-    }
-    async stat() {
-        const stat = await this.node.repo.stat();
-        return stat;
-
-    }
-}
-
-module.exports = Rise;
+module.exports = { 
+    Message, 
+    rise 
+};
