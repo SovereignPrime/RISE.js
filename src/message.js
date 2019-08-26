@@ -1,7 +1,6 @@
 'use strict'
 
 const YAML = require('yaml');
-const rise = require('./network').rise;
 
 class Message {
 	constructor(subject = "", body = {}, involved=[], attachments=[]){
@@ -13,11 +12,17 @@ class Message {
 		this.timestamp = new Date();
 	}
 
+    static register(rise, notification) {
+        console.log('Register message');
+        this._rise = rise;
+        this._notification = notification;
+    }
+
     serialize() {
         this.data = YAML.stringify(this);
     }
 
-    deserialize() {
+    deserialyze() {
         let struct = YAML.parse(this.data);
         return {...this, ...struct};
     }
@@ -31,20 +36,32 @@ class Message {
         return this
     }
 
+    get _rise() {
+        return this.constructor._rise;
+    }
+
+    get _notification() {
+        return this.constructor._notification;
+    }
+
     async send() {
-        this.from = await rise.id();
+        this.from = await this._rise.id();
         this.serialize()
         this.involved.map(async (receiver) => {
-            let payload = this.encrypt(receiver);
-            let cid = await rise.upload(payload);
-            rise.publish(receiver, cid);
+            let payload = this.encrypt(receiver),
+                cid = await this._rise.upload(payload),
+                notification = this._notification.message(cid);
+
+            this._rise.publish(receiver, notification.serialyze());
         });
     }
 
-    static receive(cid) {
-        let msg = this();
-        msg.payload = rise.download(cid);
-        return msg.decrypt().deserialyze()
+    static async receive(cid) {
+        console.log(`Recieved message: ${cid}`);
+        let msg = new Message(),
+            payload = await this._rise.download(cid);
+        msg.payload = payload[0].content.toString();
+        console.log(msg.decrypt().deserialyze());
     }
 }
 

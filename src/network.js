@@ -4,15 +4,28 @@ const IPFS = require('ipfs');
 
 class Rise {
     constructor() {
-        this.node = new IPFS({EXPERIMENTAL: {pubsub: true, ipnsPubsub: true}});
+        this.repo = process.env.IPFS_PATH || '~/.jsipfs';
+        this.node = new IPFS({repo: this.repo, EXPERIMENTAL: {pubsub: true, ipnsPubsub: true}});
+    }
+
+    registerNotificationDispatcher(dispatcher) {
+        //if (typeof(dispatcher) == function)
+            this._notificationDispatcher = dispatcher;
+    }
+
+    publish(topic, msg) {
+        this.node.pubsub.publish(topic, Buffer(msg), this.errorHandler);
     }
 
     subscribe(topic) {
-        this.node.pubsub.subscribe(topic, this.subscriptionHandler, {}, this.errorHandler);
+        this.node.pubsub.subscribe(topic, (msg) =>
+            this.subscriptionHandler(msg), {}, this.errorHandler);
     }
 
     subscriptionHandler(msg) {
         console.log(msg);
+        if (this._notificationDispatcher) 
+            this._notificationDispatcher(msg);
     }
     
     errorHandler(err) {
@@ -20,8 +33,11 @@ class Rise {
     }
 
     async id() {
-        let data = await this.node.id();
-        return data.id;
+        if (!this._cid) {
+            let data = await this.node.id();
+            this._cid = data.id;
+        } 
+        return this._cid;
     }
 
     async upload(payload) {
@@ -29,9 +45,12 @@ class Rise {
         return data[0].hash;
     }
 
-    publish(topic, msg) {
-        this.node.pubsub.publish(topic, Buffer(msg), this.errorHandler);
+    async download(cid) {
+        let file = await this.node.get(cid);
+        return file;
     }
+
+
 }
 
 const rise = new Rise();
