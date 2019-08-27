@@ -49,13 +49,14 @@ class NotificationService {
     constructor(rise) {
         console.log('Register NotificationService as dispatcher');
         this._rise = rise;
-        this.notifications = []
+        this.notifications = [];
         rise.registerNotificationDispatcher(NotificationService.dispatcher);
     }
 
     static getService(rise) {
         if (!NotificationService._service) {
             NotificationService._service = new NotificationService(rise);
+            NotificationService._service.interval = setInterval(() => NotificationService._service.notify(), 10000);
         }
         return NotificationService._service;
     }
@@ -91,6 +92,8 @@ class NotificationService {
     received(receiver, cid) {
         let notification = Notification.received(receiver, cid);
         this.addNotification(notification);
+        this.notify();
+        this.removeNotification(cid);
     }
 
     addNotification(notification) {
