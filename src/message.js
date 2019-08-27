@@ -18,6 +18,11 @@ class Message {
         this._notification = notification;
     }
 
+    async uploadAttachments() {
+        this.attachments = await this.attachments.reduce(async (acc, path) => acc.concat(await this._rise.uploadPath(path))
+            , [])
+    }
+
     serialize() {
         this.data = YAML.stringify(this);
     }
@@ -46,6 +51,7 @@ class Message {
 
     async send() {
         this.from = await this._rise.id();
+        await this.uploadAttachments();
         this.serialize()
         this.involved.map(async (receiver) => {
             let payload = this.encrypt(receiver),

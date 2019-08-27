@@ -45,6 +45,11 @@ class Rise {
         return data[0].hash;
     }
 
+    async uploadPath(payload) {
+        let data = await this.node.addFromFs(payload);
+        return data;
+    }
+
     async download(cid) {
         let file = await this.node.get(cid);
         return file;
