@@ -15,21 +15,53 @@ class Notification {
         }
     }
 
-    static async register(rise) {
-        console.log('Register Notification as dispatcher');
-        rise.registerNotificationDispatcher(this.dispatcher);
+
+    static message(receiver, cid) {
+        let notification = new this({});
+        notification.event = 'message';
+        notification.value = cid;
+        notification.receiver = receiver;
+        return notification
     }
+
+    serialyze() {
+        return YAML.stringify({
+            event: this.event, 
+            data: this.value
+        });
+    }
+
+    send(rise) {
+        rise.publish(this.receiver, this.serialyze());
+    }
+}
+
+class NotificationService {
+    constructor(rise) {
+        console.log('Register NotificationService as dispatcher');
+        this._rise = rise;
+        this.notifications = []
+        rise.registerNotificationDispatcher(NotificationService.dispatcher);
+    }
+
+    static getService(rise) {
+        if (!NotificationService._service) {
+            NotificationService._service = new NotificationService(rise);
+        }
+        return NotificationService._service;
+    }
+
 
     static dispatcher(msg) {
         let notification = new Notification(msg);
-        notification.dispatch();
+        NotificationService._service.dispatch(notification);
         return notification;
     }
 
-    dispatch() {
-        switch (this.event) {
+    dispatch(notification) {
+        switch (notification.event) {
             case 'message': 
-                Message.receive(this.value);
+                Message.receive(notification.value);
                 break;
 
             case 'received':
@@ -42,19 +74,24 @@ class Notification {
         }
     }
 
-    static message(cid) {
-        let notification = new this({});
-        notification.event = 'message';
-        notification.value = cid;
-        return notification
+    message(receiver, cid) {
+        let notification = Notification.message(receiver, cid);
+        this.addNotification(notification);
     }
 
-    serialyze() {
-        return YAML.stringify({
-            event: this.event, 
-            data: this.value
-        });
+    addNotification(notification) {
+        this.notifications.push(notification);
+        this.notify();
+    }
+
+    notify() {
+        this.notifications.forEach((notification) => {
+            notification.send(this._rise)
+        })
     }
 }
 
-module.exports = Notification
+module.exports = {
+    Notification,
+    NotificationService
+}

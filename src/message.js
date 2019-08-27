@@ -56,9 +56,8 @@ class Message {
         this.involved.map(async (receiver) => {
             let payload = this.encrypt(receiver),
                 cid = await this._rise.upload(payload),
-                notification = this._notification.message(cid);
+                notification = this._notification.message(receiver, cid);
 
-            this._rise.publish(receiver, notification.serialyze());
         });
     }
 
