@@ -29,7 +29,10 @@ class Message {
 
     deserialyze() {
         let struct = YAML.parse(this.data);
-        return {...this, ...struct};
+        for (var k in struct) {
+            this[k] = struct[k]
+        }
+        return this;
     }
 
     encrypt () {
@@ -55,8 +58,8 @@ class Message {
         this.serialize()
         this.involved.map(async (receiver) => {
             let payload = this.encrypt(receiver),
-                cid = await this._rise.upload(payload),
-                notification = this._notification.message(receiver, cid);
+                cid = await this._rise.upload(payload);
+            this._notification.message(receiver, cid);
 
         });
     }
@@ -67,6 +70,8 @@ class Message {
             payload = await this._rise.download(cid);
         msg.payload = payload[0].content.toString();
         console.log(msg.decrypt().deserialyze());
+        this._notification.received(msg.from, cid);
+        return msg;
     }
 }
 

@@ -17,8 +17,16 @@ class Notification {
 
 
     static message(receiver, cid) {
-        let notification = new this({});
+        let notification = new Notification({});
         notification.event = 'message';
+        notification.value = cid;
+        notification.receiver = receiver;
+        return notification
+    }
+
+    static received(receiver, cid) {
+        let notification = new Notification({});
+        notification.event = 'received';
         notification.value = cid;
         notification.receiver = receiver;
         return notification
@@ -32,6 +40,7 @@ class Notification {
     }
 
     send(rise) {
+        console.log(`Sending Notification(${this.receiver}, ${this.event}, ${this.value}`);
         rise.publish(this.receiver, this.serialyze());
     }
 }
@@ -65,11 +74,11 @@ class NotificationService {
                 break;
 
             case 'received':
-                //Message.received(this.data);
+                this.removeNotification(notification.value);
                 break;
 
             default:
-                console.log(`Unknown notification event: ${this.event}`);
+                console.log(`Unknown notification event: ${notification.event}`);
                 break;
         }
     }
@@ -79,12 +88,23 @@ class NotificationService {
         this.addNotification(notification);
     }
 
+    received(receiver, cid) {
+        let notification = Notification.received(receiver, cid);
+        this.addNotification(notification);
+    }
+
     addNotification(notification) {
         this.notifications.push(notification);
         this.notify();
     }
 
+    removeNotification(cid) {
+        this.notifications = this.notifications.filter((notification) => notification.value != cid)
+
+    }
+
     notify() {
+        console.log(`Notifications: ${this.notifications}`);
         this.notifications.forEach((notification) => {
             notification.send(this._rise)
         })
