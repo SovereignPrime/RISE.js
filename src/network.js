@@ -4,7 +4,7 @@ const IPFS = require('ipfs');
 
 class Rise {
     constructor() {
-        this.repo = process.env.IPFS_PATH || '~/.jsipfs';
+        this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
         this.node = new IPFS({repo: this.repo, EXPERIMENTAL: {pubsub: true, ipnsPubsub: true}});
     }
 
