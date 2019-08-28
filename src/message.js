@@ -18,6 +18,22 @@ class Message {
         this._notification = notification;
     }
 
+    static getAll({start: start, count: count}) {
+        start = start || 0;
+        count = count || 10;
+        let messages = [];
+        for (var i=0; i<count;i++) {
+            let subj = Math.random().toString(36).substring(2, 15),
+                text = Math.random().toString(36).substring(2, 15),
+                msg = new Message(subj, {text: text}, [subj]);
+            msg.type='update';
+            msg.status='new';
+            messages.push(msg);
+        }
+        return messages;
+
+    }
+
     async uploadAttachments() {
         this.attachments = await this.attachments.reduce(async (acc, path) => acc.concat(await this._rise.uploadPath(path))
             , [])
@@ -71,7 +87,6 @@ class Message {
         msg.payload = payload[0].content.toString();
         console.log(msg.decrypt().deserialyze());
         this._notification.received(msg.from, cid);
-        return msg;
     }
 }
 
