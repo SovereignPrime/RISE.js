@@ -9,7 +9,7 @@ class Rise {
     }
 
     registerNotificationDispatcher(dispatcher) {
-        //if (typeof(dispatcher) == function)
+        //if (typeof(dispatcher) == 'function')
             this._notificationDispatcher = dispatcher;
     }
 
@@ -54,6 +54,21 @@ class Rise {
         let file = await this.node.get(cid);
         return file;
     }
+
+    async saveCID(base, cid) {
+        let cids = await this.getCIDs(base);
+        cids.push(cid);
+        let data = Buffer(cids.join('\n'));
+        await this.node.files.write('/' + base, data, {create: true});
+        return cids;
+    }
+
+    async getCIDs(base) {
+        return await this.node.files.read('/' + base)
+            .then((data) => data.toString().split('\n'))
+            .catch((err) =>[]);
+    }
+
 
 
 }

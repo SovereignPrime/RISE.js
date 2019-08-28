@@ -18,19 +18,12 @@ class Message {
         this._notification = notification;
     }
 
-    static getAll({start: start, count: count}) {
+    static async getAll({start: start, count: count} = {}) {
         start = start || 0;
         count = count || 10;
-        let messages = [];
-        for (var i=0; i<count;i++) {
-            let subj = Math.random().toString(36).substring(2, 15),
-                text = Math.random().toString(36).substring(2, 15),
-                msg = new Message(subj, {text: text}, [subj]);
-            msg.type='update';
-            msg.status='new';
-            messages.push(msg);
-        }
-        return messages;
+        let message_ids = await Message._rise.getCIDs('messages'),
+            messages = await Promise.all(message_ids.map(async (cid) => await Message.get(cid)));
+        return await messages.slice(start, start + count);
 
     }
 
@@ -82,26 +75,24 @@ class Message {
         });
     }
 
-    static async receive(cid) {
-        console.log(`Recieved message: ${cid}`);
+    static async get(cid) {
         let msg = new Message(),
             payload = await Message._rise.download(cid);
         msg.payload = payload[0].content.toString();
-        console.log(msg.decrypt().deserialyze());
+        return msg.decrypt().deserialyze();
+    }
+
+    static async receive(cid) {
+        console.log(`Recieved message: ${cid}`);
+        let msg = await Message.get(cid);
         msg.save(cid)
 
         Message._notification.received(msg.from, cid);
     }
 
     async save(cid) {
-        let message_ids = await Message._rise.node.files.read('/messages')
-            .then((data) => data.toString().split('\n'))
-            .catch((err) =>[]);
-
-        message_ids.push(cid);
+        let message_ids = await Message._rise.saveCID('messages', cid);
         console.log(message_ids);
-        let data = Buffer(message_ids.join('\n'));
-        await Message._rise.node.files.write('/messages', data, {create: true});
     }
 
 }
