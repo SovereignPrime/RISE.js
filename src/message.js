@@ -70,6 +70,8 @@ class Message {
 
     async send() {
         this.from = await this._rise.id();
+        if (!this.involved.includes(this.from)) 
+            this.involved.push(this.from);
         await this.uploadAttachments();
         this.serialize()
         this.involved.map(async (receiver) => {
@@ -83,11 +85,25 @@ class Message {
     static async receive(cid) {
         console.log(`Recieved message: ${cid}`);
         let msg = new Message(),
-            payload = await this._rise.download(cid);
+            payload = await Message._rise.download(cid);
         msg.payload = payload[0].content.toString();
         console.log(msg.decrypt().deserialyze());
-        this._notification.received(msg.from, cid);
+        msg.save(cid)
+
+        Message._notification.received(msg.from, cid);
     }
+
+    async save(cid) {
+        let message_ids = await Message._rise.node.files.read('/messages')
+            .then((data) => data.toString().split('\n'))
+            .catch((err) =>[]);
+
+        message_ids.push(cid);
+        console.log(message_ids);
+        let data = Buffer(message_ids.join('\n'));
+        await Message._rise.node.files.write('/messages', data, {create: true});
+    }
+
 }
 
 module.exports = Message
