@@ -2,8 +2,9 @@
 
 const IPFS = require('ipfs');
 const YAML = require('yaml');
+const EventEmitter = require('events');
 
-class Rise {
+class Rise extends EventEmitter {
     constructor() {
         this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
         this.node = new IPFS({repo: this.repo, EXPERIMENTAL: {pubsub: true, ipnsPubsub: true}});
@@ -90,6 +91,11 @@ class Rise {
         objects.push(object);
         await this.saveObjects(base, objects);
     }
+
+    started() {
+        this.emit('ready');
+    }
+
 }
 
 const rise = new Rise();

@@ -12,6 +12,7 @@ rise.node.once('ready', async () => {
     let notification = NotificationService.getService(rise);
     Message.register(rise, notification);
     rise.subscribe(cid);
+    rise.started();
 });
 
 module.exports = { 
