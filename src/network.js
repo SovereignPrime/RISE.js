@@ -6,6 +6,7 @@ const EventEmitter = require('events');
 
 class Rise extends EventEmitter {
     constructor() {
+        super();
         this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
         this.node = new IPFS({repo: this.repo, EXPERIMENTAL: {pubsub: true, ipnsPubsub: true}});
     }
