@@ -84,7 +84,7 @@ class NotificationService {
     dispatch(notification) {
         switch (notification.event) {
             case 'message': 
-                Message.receive(notification.value);
+                Message.receive(notification.from, notification.value);
                 break;
 
             case 'received':

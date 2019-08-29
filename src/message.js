@@ -82,11 +82,11 @@ class Message {
         return msg.decrypt().deserialyze();
     }
 
-    static async receive(cid) {
-        console.log(`Recieved message: ${cid}`);
+    static async receive(from, cid) {
+        console.log(`Recieved message from ${from} : ${cid}`);
         await Message._rise.pin(cid);
         await Message._rise.saveCID('messages', cid);
-        Message._notification.received(msg.from, cid);
+        Message._notification.received(from, cid);
     }
 }
 
