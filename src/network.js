@@ -55,6 +55,10 @@ class Rise {
         return file;
     }
 
+    async pin(cid, recursive = false) {
+        return await this.pin.add(cid, {recurcive: recurcive});
+    }
+
     async saveCID(base, cid) {
         let cids = await this.getCIDs(base);
         cids.push(cid);

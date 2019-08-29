@@ -84,17 +84,10 @@ class Message {
 
     static async receive(cid) {
         console.log(`Recieved message: ${cid}`);
-        let msg = await Message.get(cid);
-        msg.save(cid)
-
+        await Message._rise.pin(cid);
+        await Message._rise.saveCID('messages', cid);
         Message._notification.received(msg.from, cid);
     }
-
-    async save(cid) {
-        let message_ids = await Message._rise.saveCID('messages', cid);
-        console.log(message_ids);
-    }
-
 }
 
 module.exports = Message
