@@ -1,6 +1,7 @@
 'use strict'
 
 const IPFS = require('ipfs');
+const YAML = require('yaml');
 
 class Rise {
     constructor() {
@@ -55,8 +56,8 @@ class Rise {
         return file;
     }
 
-    async pin(cid, recursive = false) {
-        return await this.pin.add(cid, {recurcive: recurcive});
+    async pin(cid, recurcive = false) {
+        return await this.node.pin.add(cid, {recurcive: recurcive});
     }
 
     async saveCID(base, cid) {
@@ -73,8 +74,22 @@ class Rise {
             .catch((err) =>[]);
     }
 
+    async getObjects(base) {
+        return await this.node.files.read('/' + base)
+            .then((data) => YAML.parse(data.toString()))
+            .catch((err) =>[]);
+    }
 
+    async saveObjects(base, objects) {
+        let data = Buffer(YAML.stringify(objects));
+        await this.node.files.write('/' + base, data, {create: true, truncate: true});
+    }
 
+    async saveObject(base, object) {
+        let objects = await this.getObjects(base);
+        objects.push(object);
+        await this.saveObjects(base, objects);
+    }
 }
 
 const rise = new Rise();
