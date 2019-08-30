@@ -12,7 +12,7 @@ class Rise extends EventEmitter {
     }
 
     registerNotificationDispatcher(dispatcher) {
-        //if (typeof(dispatcher) == 'function')
+        if (typeof(dispatcher) == 'function')
             this._notificationDispatcher = dispatcher;
     }
 
