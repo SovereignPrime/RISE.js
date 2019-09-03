@@ -69,7 +69,7 @@ class NotificationService {
     static getService(rise) {
         if (!NotificationService._service) {
             NotificationService._service = new NotificationService(rise);
-            NotificationService._service.interval = setInterval(() => NotificationService._service.notify(), 10000);
+            NotificationService._service.interval = setInterval(() => NotificationService._service.notify(), 20000);
         }
         return NotificationService._service;
     }
@@ -116,6 +116,7 @@ class NotificationService {
     }
 
     removeNotification(cid) {
+        console.log(`Remove: ${cid}`);
         this.notifications = this.notifications.filter((notification) => notification.value != cid)
         this.save();
 

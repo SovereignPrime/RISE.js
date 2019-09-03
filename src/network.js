@@ -18,18 +18,13 @@ class Rise extends EventEmitter {
                 },
             },
             EXPERIMENTAL: {
-                pubsub: true,
                 ipnsPubsub: true,
-
             },
             libp2p: {
                 config: {
                     dht: {
-                        enabled: true,
-                    },
-                    pubsub: {
-                        enabled: true,
-
+                        enabled: false,
+                        kBucketSize: 1
                     },
                 },
             },
