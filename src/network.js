@@ -8,7 +8,22 @@ class Rise extends EventEmitter {
     constructor() {
         super();
         this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
-        this.node = new IPFS({repo: this.repo, EXPERIMENTAL: {pubsub: true, ipnsPubsub: true}});
+        this.node = new IPFS({
+            repo: this.repo,
+            EXPERIMENTAL: {
+                pubsub: true,
+                ipnsPubsub: true,
+
+            },
+            libp2p: {
+                config: {
+                    dht: {
+                        enabled: true,
+                    },
+                },
+            },
+
+        });
     }
 
     registerNotificationDispatcher(dispatcher) {
