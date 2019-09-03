@@ -10,6 +10,13 @@ class Rise extends EventEmitter {
         this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
         this.node = new IPFS({
             repo: this.repo,
+            relay: {
+                enabled: true, 
+                hop: {
+                    enabled: true,
+                    active: true,
+                },
+            },
             EXPERIMENTAL: {
                 pubsub: true,
                 ipnsPubsub: true,
@@ -19,6 +26,10 @@ class Rise extends EventEmitter {
                 config: {
                     dht: {
                         enabled: true,
+                    },
+                    pubsub: {
+                        enabled: true,
+
                     },
                 },
             },
