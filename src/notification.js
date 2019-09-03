@@ -122,7 +122,7 @@ class NotificationService {
     }
 
     notify() {
-        console.log(`Notifications: ${this.notifications}`);
+        //console.log(`Notifications: ${this.notifications}`);
         this.notifications.forEach((notification) => {
             notification.send(this._rise)
         })

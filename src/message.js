@@ -63,8 +63,8 @@ class Message {
 
     async send() {
         this.from = await this._rise.id();
-        if (!this.involved.includes(this.from)) 
-            this.involved.push(this.from);
+        //if (!this.involved.includes(this.from)) 
+        //    this.involved.push(this.from);
         await this.uploadAttachments();
         this.serialize()
         this.involved.map(async (receiver) => {
