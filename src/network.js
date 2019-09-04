@@ -25,7 +25,7 @@ class Rise extends EventEmitter {
                     peerDiscovery: {
                         autoDial: true,
                         mdns: {
-                            interval: 1000,
+                            interval: 100,
                             enabled: true,
                         },
                     },
@@ -33,9 +33,9 @@ class Rise extends EventEmitter {
                         enabled: true,
                         kBucketSize: 1,
                         randomWalk: {
-                            enabled: true,
+                            enabled: false,
                             interval: 300e3,
-                            timeout: 10e3,
+                            timeout: 100e3,
                         },
                     },
                 },

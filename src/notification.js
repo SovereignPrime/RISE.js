@@ -49,6 +49,7 @@ class Notification {
 
     send(rise) {
         console.log(`Sending Notification(${this.receiver}, ${this.event}, ${this.value}`);
+        rise.node.ping(this.receiver);
         rise.publish(this.receiver, this.serialyze());
     }
 }
