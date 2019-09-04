@@ -22,9 +22,21 @@ class Rise extends EventEmitter {
             },
             libp2p: {
                 config: {
+                    peerDiscovery: {
+                        autoDial: true,
+                        mdns: {
+                            interval: 1000,
+                            enabled: true,
+                        },
+                    },
                     dht: {
-                        enabled: false,
-                        kBucketSize: 1
+                        enabled: true,
+                        kBucketSize: 1,
+                        randomWalk: {
+                            enabled: true,
+                            interval: 300e3,
+                            timeout: 10e3,
+                        },
                     },
                 },
             },
