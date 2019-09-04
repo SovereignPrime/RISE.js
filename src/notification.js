@@ -104,9 +104,7 @@ class NotificationService {
 
     received(receiver, cid) {
         let notification = Notification.received(receiver, cid);
-        this.addNotification(notification);
-        this.notify();
-        this.removeNotification(cid);
+        notification.send(this._rise);
     }
 
     addNotification(notification) {
