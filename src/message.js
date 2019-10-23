@@ -1,9 +1,10 @@
 'use strict'
 
-const YAML = require('yaml');
+const Serializable = require('./serializable');
 
-class Message {
+class Message extends Serializable {
 	constructor(subject = "", body = {}, involved=[], attachments=[]){
+        super();
         
 		this.subject = subject;
 		this.body = body;
@@ -30,18 +31,6 @@ class Message {
     async uploadAttachments() {
         this.attachments = await this.attachments.reduce(async (acc, path) => acc.concat(await this._rise.uploadPath(path))
             , [])
-    }
-
-    serialize() {
-        this.data = YAML.stringify(this);
-    }
-
-    deserialyze() {
-        let struct = YAML.parse(this.data);
-        for (var k in struct) {
-            this[k] = struct[k]
-        }
-        return this;
     }
 
     encrypt () {
