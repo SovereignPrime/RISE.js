@@ -1,6 +1,6 @@
 'use strict'
 
-const IPFS = require('ipfs');
+const IPFS = require('ipfs-core');
 const YAML = require('yaml');
 const EventEmitter = require('events');
 
@@ -8,7 +8,7 @@ class Rise extends EventEmitter {
     constructor() {
         super();
         this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
-        this.node = new IPFS({
+        IPFS.create({
             repo: this.repo,
             relay: {
                 enabled: true, 
@@ -25,13 +25,14 @@ class Rise extends EventEmitter {
                     peerDiscovery: {
                         autoDial: true,
                         mdns: {
-                            interval: 100,
+                            interval: 1000,
                             enabled: true,
                         },
                     },
                     dht: {
-                        enabled: true,
-                        kBucketSize: 1,
+                        enabled: false,
+                        kBucketSize: 100,
+                        concurrency: 1,
                         randomWalk: {
                             enabled: false,
                             interval: 300e3,
@@ -41,6 +42,9 @@ class Rise extends EventEmitter {
                 },
             },
 
+        }).then((node) => {
+            this.node = node;
+            this.started();
         });
     }
 
@@ -115,15 +119,38 @@ class Rise extends EventEmitter {
             .catch((err) =>[]);
     }
 
+    async getPublic(base) {
+        return await this.node.files.read('/public/' + base)
+            .then((data) => YAML.parse(data.toString()))
+            .catch((err) => {});
+    }
+
+    async savePublic(base, object) {
+        let data = Buffer(YAML.stringify(object));
+        await this.node.files.mkdir('/public', (_) => {});
+        await this.node.files.write('/public/' + base, data, {create: true, truncate: true});
+    }
+
     async saveObjects(base, objects) {
         let data = Buffer(YAML.stringify(objects));
         await this.node.files.write('/' + base, data, {create: true, truncate: true});
     }
 
-    async saveObject(base, object) {
+    async saveObject(base, object, key = undefined) {
         let objects = await this.getObjects(base);
-        objects.push(object);
+        if (key == undefined) {
+            objects.push(object);
+        } else {
+            let index = objects.findIndex((o) => o[key] == object[key]);
+            objects[index] = object;
+        }
         await this.saveObjects(base, objects);
+    }
+
+    async getIPNSObject(cid, file) {
+        let dir = await this.node.name.resolve(`/ipns/${cid}`),
+            data = await this.node.cat(`${dir}/${file}`);
+        return YAML.parse(data.toString());
     }
 
     started() {

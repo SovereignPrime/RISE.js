@@ -10,6 +10,10 @@ class Serializable {
 
     deserialyze() {
         let struct = YAML.parse(this.data);
+        return this.deserialyzeObj(struct);
+    }
+
+    deserialyzeObj(struct) {
         for (var k in struct) {
             this[k] = struct[k]
         }
