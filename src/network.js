@@ -108,9 +108,16 @@ class Rise extends EventEmitter {
     }
 
     async getCIDs(base) {
-        return await this.node.files.read('/' + base)
-            .then((data) => data.toString().split('\n'))
-            .catch((err) =>[]);
+        const chunks = [];
+
+        try {
+            for await (const chunk of this.node.files.read('/' + base)) {
+                chunks.push(chunk);
+            }
+            return uint8ArrayConcat(chunks).toString().split('\n')
+        } catch (err) {
+            return [];
+        }
     }
 
     async getObjects(base) {
