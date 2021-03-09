@@ -8,13 +8,13 @@ const {NotificationService} = require('./notification');
 
 const rise = RISE.rise;
 
-rise.once('ready', async () => {
+rise.once('started', async () => {
     let cid = await rise.id();
     let notification = NotificationService.getService(rise);
     Message.register(rise, notification);
     Contact.register(rise);
     rise.subscribe(cid);
-    //rise.started();
+    rise.started();
 });
 
 module.exports = { 

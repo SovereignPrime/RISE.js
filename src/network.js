@@ -26,7 +26,7 @@ class Rise extends EventEmitter {
             },
         }).then((node) => {
             this.node = node;
-            this.started();
+            this.emit('started');
         });
     }
 
