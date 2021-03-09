@@ -10,38 +10,20 @@ class Rise extends EventEmitter {
         this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
         IPFS.create({
             repo: this.repo,
-            relay: {
-                enabled: true, 
-                hop: {
-                    enabled: true,
-                    active: true,
-                },
-            },
             EXPERIMENTAL: {
                 ipnsPubsub: true,
+                sharding: false
             },
-            libp2p: {
-                config: {
-                    peerDiscovery: {
-                        autoDial: true,
-                        mdns: {
-                            interval: 1000,
-                            enabled: true,
-                        },
-                    },
-                    dht: {
-                        enabled: false,
-                        kBucketSize: 100,
-                        concurrency: 1,
-                        randomWalk: {
-                            enabled: false,
-                            interval: 300e3,
-                            timeout: 100e3,
-                        },
-                    },
+            config: {
+                PubSub: {
+                    Router: 'gossipsub',
+                    Enabled: true 
                 },
-            },
+                Routing: {
+                    Type: 'dht',
+                },
 
+            },
         }).then((node) => {
             this.node = node;
             this.started();
@@ -54,7 +36,7 @@ class Rise extends EventEmitter {
     }
 
     publish(topic, msg) {
-        this.node.pubsub.publish(topic, Buffer(msg), this.errorHandler);
+        this.node.pubsub.publish(topic, msg, this.errorHandler);
     }
 
     subscribe(topic) {
@@ -81,8 +63,8 @@ class Rise extends EventEmitter {
     }
 
     async upload(payload) {
-        let data = await this.node.add(Buffer(payload));
-        return data[0].hash;
+        let data = await this.node.add(payload);
+        return data.cid.toString();
     }
 
     async uploadPath(payload) {
@@ -102,7 +84,7 @@ class Rise extends EventEmitter {
     async saveCID(base, cid) {
         let cids = await this.getCIDs(base);
         cids.push(cid);
-        let data = Buffer(cids.join('\n'));
+        let data = cids.join('\n');
         await this.node.files.write('/' + base, data, {create: true});
         return cids;
     }
@@ -133,13 +115,13 @@ class Rise extends EventEmitter {
     }
 
     async savePublic(base, object) {
-        let data = Buffer(YAML.stringify(object));
+        let data = YAML.stringify(object);
         await this.node.files.mkdir('/public', (_) => {});
         await this.node.files.write('/public/' + base, data, {create: true, truncate: true});
     }
 
     async saveObjects(base, objects) {
-        let data = Buffer(YAML.stringify(objects));
+        let data = YAML.stringify(objects);
         await this.node.files.write('/' + base, data, {create: true, truncate: true});
     }
 
@@ -164,6 +146,13 @@ class Rise extends EventEmitter {
         this.emit('ready');
     }
 
+    async test(cid) {
+        let addrs = await this.node.dht.findPeer(cid);
+        addrs.addrs.forEach((addr) => {
+            console.log(addr.ip);
+            this.node.swarm.connect(addr)
+        });
+    }
 }
 
 const rise = new Rise();
