@@ -90,9 +90,15 @@ class Rise extends EventEmitter {
     }
 
     async getPublic(base) {
-        return await this.node.files.read('/public/' + base)
-            .then((data) => YAML.parse(data.toString()))
-            .catch((err) => {});
+        const chunks = [];
+        try {
+        for await (const chunk of this.node.files.read('/public/' + base)) {
+            chunks.push(chunk);
+        }
+        return YAML.parse(uint8ArrayConcat(chunks).toString());
+        } catch (e) {
+            return {};
+        }
     }
 
     async savePublic(base, object) {
