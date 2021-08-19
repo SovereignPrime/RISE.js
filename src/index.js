@@ -8,8 +8,9 @@ const {NotificationService} = require('./notification');
 
 const rise = RISE.rise;
 
-rise.once('started', async () => {
-    let cid = await rise.id();
+//rise.once('started', async () => {
+rise.id().then((cid) => {
+    console.log(`Started with id ${cid}`);
     let notification = NotificationService.getService(rise);
     Message.register(rise, notification);
     Contact.register(rise);
