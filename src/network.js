@@ -1,33 +1,14 @@
 'use strict'
 
-const IPFS = require('ipfs-core');
+const IPFS = require('ipfs-http-client');
 const YAML = require('yaml');
 const EventEmitter = require('events');
 
 class Rise extends EventEmitter {
     constructor() {
         super();
-        this.repo = process.env.IPFS_PATH || process.env.HOME + '/.jsipfs';
-        IPFS.create({
-            repo: this.repo,
-            EXPERIMENTAL: {
-                ipnsPubsub: true,
-                sharding: false
-            },
-            config: {
-                PubSub: {
-                    Router: 'gossipsub',
-                    Enabled: true 
-                },
-                Routing: {
-                    Type: 'dht',
-                },
-
-            },
-        }).then((node) => {
-            this.node = node;
-            this.emit('started');
-        });
+        this.node = IPFS.create({port: 5002});
+        this.emit('started');
     }
 
     registerNotificationDispatcher(dispatcher) {
@@ -147,11 +128,17 @@ class Rise extends EventEmitter {
     }
 
     async test(cid) {
-        let addrs = await this.node.dht.findPeer(cid);
+        let k = new Uint8Array(cid),
+            v = new Uint8Array("Hellow");
+
+        for await (const r of this.node.dht.put(k, v)) {
+            console.log(r)
+        }
+        /* let addrs = await this.node.dht.findPeer(cid);
         addrs.addrs.forEach((addr) => {
             console.log(addr.ip);
             this.node.swarm.connect(addr)
-        });
+        }); */
     }
 }
 
