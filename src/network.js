@@ -91,7 +91,7 @@ class Rise extends EventEmitter {
             }
             return YAML.parse(uint8ArrayConcat(chunks).toString());
         } catch (e) {
-            console.log(e);
+            //console.log(e);
             return [];
         }
     }
@@ -104,7 +104,7 @@ class Rise extends EventEmitter {
             }
             return YAML.parse(uint8ArrayConcat(chunks).toString());
         } catch (e) {
-            console.log(e);
+            //console.log(e);
             return {};
         }
     }
@@ -146,7 +146,7 @@ class Rise extends EventEmitter {
             v = new Uint8Array("Hellow");
 
         for await (const r of this.node.dht.put(k, v)) {
-            console.log(r)
+            //console.log(r)
         }
         /* let addrs = await this.node.dht.findPeer(cid);
         addrs.addrs.forEach((addr) => {
