@@ -84,19 +84,27 @@ class Rise extends EventEmitter {
     }
 
     async getObjects(base) {
-        return await this.node.files.read('/' + base)
-            .then((data) => YAML.parse(data.toString()))
-            .catch((err) =>[]);
+        const chunks = [];
+        try {
+            for await (const chunk of this.node.files.read('/' + base)) {
+                chunks.push(chunk);
+            }
+            return YAML.parse(uint8ArrayConcat(chunks).toString());
+        } catch (e) {
+            console.log(e);
+            return [];
+        }
     }
 
     async getPublic(base) {
         const chunks = [];
         try {
-        for await (const chunk of this.node.files.read('/public/' + base)) {
-            chunks.push(chunk);
-        }
-        return YAML.parse(uint8ArrayConcat(chunks).toString());
+            for await (const chunk of this.node.files.read('/public/' + base)) {
+                chunks.push(chunk);
+            }
+            return YAML.parse(uint8ArrayConcat(chunks).toString());
         } catch (e) {
+            console.log(e);
             return {};
         }
     }

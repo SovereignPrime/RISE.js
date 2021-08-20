@@ -3,12 +3,24 @@
 const Serializable = require('./serializable');
 
 class Contact extends Serializable {
-    constructor(cid, name = "", phone = "", address = "", publicKey = "") {
+    constructor(
+        cid,
+        name = "",
+        nick = "",
+        email = "",
+        phone = "",
+        address = "",
+        avatar = "",
+        publicKey = ""
+    ) {
         super();
         this.cid = cid;
         this.name = name;
+        this.nick = nick
+        this.email = email
         this.phone = phone;
         this.address = address;
+        this.avatar = avatar
         this.publicKey = publicKey;
     }
 
@@ -20,8 +32,8 @@ class Contact extends Serializable {
     static async me() {
         let vcard = await Contact._rise.getPublic("vcard");
 
-        console.log(`Vcard: ${vcard}`);
-        if (!vcard || vcard == {}) {
+        console.log('Vcard: ', vcard);
+        if (!vcard || !vcard.cid) {
             return await Contact.bootstrap();
         } else {
             let me = new Contact(vcard.cid);
