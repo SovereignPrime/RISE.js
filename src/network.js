@@ -2,6 +2,7 @@
 
 const IPFS = require('ipfs-http-client');
 const YAML = require('yaml');
+const uint8ArrayConcat = require('uint8arrays/concat');
 const EventEmitter = require('events');
 
 class Rise extends EventEmitter {
@@ -77,36 +78,27 @@ class Rise extends EventEmitter {
             for await (const chunk of this.node.files.read('/' + base)) {
                 chunks.push(chunk);
             }
-            return uint8ArrayConcat(chunks).toString().split('\n')
+            return Buffer.concat(chunks).toString().split('\n')
         } catch (err) {
             return [];
         }
     }
 
-    async getObjects(base) {
+    async getObjects(base, def = []) {
         const chunks = [];
         try {
             for await (const chunk of this.node.files.read('/' + base)) {
                 chunks.push(chunk);
             }
-            return YAML.parse(uint8ArrayConcat(chunks).toString());
+            return YAML.parse(Buffer.concat(chunks).toString());
         } catch (e) {
-            //console.log(e);
-            return [];
+            console.log(e);
+            return def;
         }
     }
 
     async getPublic(base) {
-        const chunks = [];
-        try {
-            for await (const chunk of this.node.files.read('/public/' + base)) {
-                chunks.push(chunk);
-            }
-            return YAML.parse(uint8ArrayConcat(chunks).toString());
-        } catch (e) {
-            //console.log(e);
-            return {};
-        }
+        return await this.getObjects(`public/${base}`, {});
     }
 
     async savePublic(base, object) {
