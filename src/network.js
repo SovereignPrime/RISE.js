@@ -106,6 +106,7 @@ class Rise extends EventEmitter {
         try {
             await this.node.files.mkdir('/public');
         } finally {
+            console.log(`Saving to '${base}'`);
             await this.node.files.write('/public/' + base, data, {create: true, truncate: true});
         }
     }
