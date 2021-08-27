@@ -64,6 +64,12 @@ class Contact extends Serializable {
             return new Contact(cid).deserialyzeObj(contact);
         }
     }
+
+    async save() {
+        let myCid = await Contact._rise.id();
+        if (this.cid == myCid)
+            Contact._rise.savePublic("vcard", this);
+    }
 }
 
 module.exports = Contact

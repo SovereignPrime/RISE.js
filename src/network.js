@@ -103,8 +103,11 @@ class Rise extends EventEmitter {
 
     async savePublic(base, object) {
         let data = YAML.stringify(object);
-        await this.node.files.mkdir('/public', (_) => {});
-        await this.node.files.write('/public/' + base, data, {create: true, truncate: true});
+        try {
+            await this.node.files.mkdir('/public');
+        } finally {
+            await this.node.files.write('/public/' + base, data, {create: true, truncate: true});
+        }
     }
 
     async saveObjects(base, objects) {
