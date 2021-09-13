@@ -122,7 +122,10 @@ class Rise extends EventEmitter {
             objects.push(object);
         } else {
             let index = objects.findIndex((o) => o[key] == object[key]);
-            objects[index] = object;
+            if (index >= 0)
+                objects[index] = object;
+            else
+                objects.push(object);
         }
         await this.saveObjects(base, objects);
     }

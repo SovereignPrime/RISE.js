@@ -69,6 +69,9 @@ class Contact extends Serializable {
         let myCid = await Contact._rise.id();
         if (this.cid == myCid)
             Contact._rise.savePublic("vcard", this);
+        else
+            await Contact._rise.saveObject('contacts', this, 'cid');
+
     }
 }
 
