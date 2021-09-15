@@ -11,6 +11,7 @@ class Contact extends Serializable {
         phone = "",
         address = "",
         avatar = "",
+        groups = [],
         publicKey = ""
     ) {
         super();
@@ -21,6 +22,7 @@ class Contact extends Serializable {
         this.phone = phone;
         this.address = address;
         this.avatar = avatar
+        this.groups = groups
         this.publicKey = publicKey;
     }
 
@@ -63,6 +65,19 @@ class Contact extends Serializable {
             }
             return new Contact(cid).deserialyzeObj(contact);
         }
+    }
+
+    static async getByGroupId(gid=undefined) {
+        let contacts = await Contact._rise.getObjects("contacts");
+        if (gid == undefined)
+            return contacts.map(c => new Contact(c.cid).deserialyzeObj(c));
+        else
+            return contacts.filter((c) => c.groups.indexOf(gid) >= 0);
+    }
+
+    addToGroup(group) {
+        if (this.groups.indexOf(group.id) < 0)
+            this.groups.push(group.id);
     }
 
     async save() {
