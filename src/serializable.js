@@ -19,6 +19,10 @@ class Serializable {
         }
         return this;
     }
+
+    async save() {
+        await this.constructor._rise.saveObject(this.constructor.name + 's', this, 'id');
+    }
 }
 
 module.exports = Serializable

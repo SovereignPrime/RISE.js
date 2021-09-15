@@ -17,21 +17,15 @@ class Group extends Serializable {
     }
 
 	addSubgroup(group) {
-		this.subgroups.push(group)
+        group.parent = this.id;
+        group.save()
 	}
 
 	deleteSubgroup(group) {
-		var index = this.subgroups.indexOf(group);
-		if(index != -1){
-		   this.subgroups.splice(index, 1);
-		}
+        group.parent = undefined;
+        group.save();
 	}
 
-    async save() {
-        let myCid = await Group._rise.id();
-        await Group._rise.saveObject('groups', this, 'id');
-
-    }
 }
 
 module.exports = Group;
