@@ -20,6 +20,16 @@ class Serializable {
         return this;
     }
 
+    static async get(id) {
+        let objs = await this.getAll();
+        return objs.find(o => o.id == id);
+    }
+
+    static async getAll() {
+        let objs = await this._rise.getObjects(this.name + "s");
+        return objs.map(o => new this(o.id).deserialyzeObj(o));
+    }
+
     async save() {
         await this.constructor._rise.saveObject(this.constructor.name + 's', this, 'id');
     }

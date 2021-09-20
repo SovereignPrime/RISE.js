@@ -68,7 +68,7 @@ class Contact extends Serializable {
     }
 
     static async getByGroupId(gid=undefined) {
-        let contacts = await Contact._rise.getObjects("contacts");
+        let contacts = await Contact._rise.getObjects("Contacts");
         if (gid == undefined)
             return contacts.map(c => new Contact(c.cid).deserialyzeObj(c));
         else
@@ -78,6 +78,12 @@ class Contact extends Serializable {
     addToGroup(group) {
         if (this.groups.indexOf(group.id) < 0)
             this.groups.push(group.id);
+    }
+
+    async uploadAvatar(avatar) {
+        this.avatar = await this._rise.upload(avatar);
+        this.save()
+
     }
 
     async save() {
