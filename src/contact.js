@@ -81,7 +81,7 @@ class Contact extends Serializable {
     }
 
     async uploadAvatar(avatar) {
-        this.avatar = await this._rise.upload(avatar);
+        this.avatar = await Contact._rise.upload(avatar);
         this.save()
 
     }
