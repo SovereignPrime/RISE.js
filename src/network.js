@@ -44,6 +44,15 @@ class Rise extends EventEmitter {
         return this._cid;
     }
 
+    async base_url() {
+        if (!this._base_Url) {
+            let multiaddr = await this.node.config.get('Addresses.Gateway'),
+                data = multiaddr.split('/');
+            this._base_Url = `http://${data[2]}:${data[4]}`;
+        } 
+        return this._base_Url;
+    }
+
     async upload(payload) {
         let data = await this.node.add(payload);
         return data.cid.toString();
