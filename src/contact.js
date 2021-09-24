@@ -24,6 +24,8 @@ class Contact extends Serializable {
         this.avatar = avatar
         this.groups = groups
         this.publicKey = publicKey;
+        if (avatar != "")
+            this.avatar_url = `${Contact._rise.base_url()}/ipfs/${avatar}`;
     }
 
     static register(rise) {
@@ -82,8 +84,9 @@ class Contact extends Serializable {
 
     async uploadAvatar(avatar) {
         this.avatar = await Contact._rise.upload(avatar);
+        this.avatar_url = `${await Contact._rise.base_url()}/ipfs/${this.avatar}`;
         this.save()
-
+        return this;
     }
 
     async save() {
